@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Form</title>
+  <style>
+    body {
+      font-family: Arial;
+      background-color: #f2f2f2;
+      padding: 20px;
+    }
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+      margin: auto;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 10px;
+      margin-bottom: 15px;
+    }
+    button {
+      background-color: green;
+      color: white;
+      padding: 10px;
+      border: none;
+      width: 100%;
+      cursor: pointer;
+    }
+    table {
+      margin-top: 30px;
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table, th, td {
+      border: 1px solid black;
+      padding: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Student Entry Form</h2>
+
+<form id="studentForm">
+  <input type="text" id="studentName" placeholder="Student Name" required>
+  <input type="text" id="class" placeholder="Class" required>
+  <select id="resultCard" required>
+    <option value="">pass or fail?</option>
+    <option value="pass">pass</option>
+    <option value="fail">fail</option>
+  </select>
+  <select id="FeePaidStatus" required>
+    <option value="">Fee Paid?</option>
+    <option value="yes">yes</option>
+    <option value="no">no</option>
+  </select>
+  <input type="text" id="studentID" placeholder="Student ID" required>
+  <button type="submit">Add to Sheet</button>
+</form>
+
+<br>
+<button onclick="downloadCSV()">Download CSV</button>
+
+<table id="dataTable">
+  <thead>
+    <tr>
+      <th>Student Name</th>
+      <th>Class</th>
+      <th>Result Card</th>
+      <th>Fee Paid Status</th>
+      <th>Student ID</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+  const form = document.getElementById("studentForm");
+  const tableBody = document.querySelector("#dataTable tbody");
+  let data = [];
+
+  form.addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const student = {
+      studentName: document.getElementById("studentName").value,
+      class: document.getElementById("class").value,
+      resultCard: document.getElementById("resultCard").value,
+      FeePaidStatus: document.getElementById("FeePaidStatus").value,
+      studentID: document.getElementById("studentID").value,
+    };
+
+    data.push(student);
+    addToTable(student);
+    form.reset();
+  });
+
+  function addToTable(student) {
+    const row = document.createElement("tr");
+    for (const key in student) {
+      const cell = document.createElement("td");
+      cell.textContent = student[key];
+      row.appendChild(cell);
+    }
+    tableBody.appendChild(row);
+  }
+
+  function downloadCSV() {
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "studentName,class,resultCard,FeePaidStatus,studentID\n";
+    data.forEach(row => {
+      csvContent += `${row.studentName},${row.class},${row.resultCard},${row.FeePaidStatus},${row.studentID}\n`;
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "students_data.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+</script>
+
+</body>
+</html>
