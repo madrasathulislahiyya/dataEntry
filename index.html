@@ -45,8 +45,29 @@
 <h2>Student Entry Form</h2>
 
 <form id="studentForm">
-  <input type="text" id="studentName" placeholder="Student Name" required>
-  <input type="text" id="class" placeholder="Class" required>
+  <select id="class" required>
+    <option value="">Select Class</option>
+    <option value="KG">KG</option>
+    <option value="1A">1A</option>
+    <option value="1B">1B</option>
+    <option value="1C">1C</option>
+    <option value="2A">2A</option>
+    <option value="2B">2B</option>
+    <option value="2C">2C</option>
+    <option value="3A">3A</option>
+    <option value="3B">3B</option>
+    <option value="3C">3C</option>
+    <option value="4">4</option>  
+    <option value="5">5</option>
+    <option value="6">6</option>
+    <option value="7">7</option>
+    <option value="8">8</option>
+  </select>
+  
+  <select id="studentName" required>
+    <option value="">Select Student Name</option>
+  </select>
+
   <select id="resultCard" required>
     <option value="">pass or fail?</option>
     <option value="pass">pass</option>
@@ -79,6 +100,61 @@
 </table>
 
 <script>
+
+  const classToStudents = {
+    
+    "KG": [
+    'Muhammed hathim',
+    'Muhammed izaan',
+    'Omar abdul rahman',
+    'Muhammed kv',
+    'Muhammed afshin bilal',
+    'Adam A',
+    'Aadam Muhammed',
+    'Ayan rasheed',
+    'Muhammed hazim javid',
+    'Muhammed ozil',
+    'Muhammed Aamir',
+    'Muhammed ayizin anas',
+    'Salah ameer',
+    'Ajwa arshad',
+    'Amina menal',
+    'Kenza suraj',
+    'Hawwa maryam',
+    'Ziya mehar',
+    'Ziya ayisha farhan',
+    'Zahabiya pk',
+    'Fathima inaya',
+    'Ayisha aslam',
+    'Zahara Amana',
+    'Zahara fathima',
+    'Minsa maryam'
+  ]
+,
+    "1A": ["Fatima", "Ali", "Kiran", "Bilal", "Zain" /* ... */],
+    "1B": ["Zara", "Usman", "Khalid", "Noor", "Imran" /* ... */],
+  };
+
+  const classSelect = document.getElementById("class");
+  const studentNameSelect = document.getElementById("studentName");
+
+  classSelect.addEventListener("change", () => {
+    const selectedClass = classSelect.value;
+    studentNameSelect.innerHTML = '<option value="">Select Student Name</option>';
+
+    if (classToStudents[selectedClass]) {
+      classToStudents[selectedClass].forEach(name => {
+        const option = document.createElement("option");
+        option.value = name;
+        option.textContent = name;
+        studentNameSelect.appendChild(option);
+      });
+    }
+  });
+
+
+
+  // division
   const form = document.getElementById("studentForm");
   const tableBody = document.querySelector("#dataTable tbody");
   let data = [];
