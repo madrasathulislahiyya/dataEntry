@@ -1,0 +1,449 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+  <title>Student Form</title>
+  <style>
+    body {
+      font-family: Arial;
+      background-color: #f2f2f2;
+      padding: 20px;
+    }
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+      margin: auto;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 10px;
+      margin-bottom: 15px;
+    }
+    button {
+      background-color: green;
+      color: white;
+      padding: 10px;
+      border: none;
+      width: 100%;
+      cursor: pointer;
+    }
+    table {
+      margin-top: 30px;
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table, th, td {
+      border: 1px solid black;
+      padding: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Student Entry Form</h2>
+
+<form id="studentForm">
+  <select id="class" required>
+    <option value="">Select Class</option>
+    <option value="KG">KG</option>
+    <option value="1A">1A</option>
+    <option value="1B">1B</option>
+    <option value="1C">1C</option>
+    <option value="2A">2A</option>
+    <option value="2B">2B</option>
+    <option value="2C">2C</option>
+    <option value="3A">3A</option>
+    <option value="3B">3B</option>
+    <option value="4">4</option>  
+    <option value="6">6</option>
+    <option value="7">7</option>
+  </select>
+  
+  <select id="studentName" required>
+    <option value="">Select Student Name</option>
+  </select>
+
+  <select id="resultCard" required>
+    <option value="">pass or fail?</option>
+    <option value="pass">pass</option>
+    <option value="fail">fail</option>
+    <option value="noexam">noexam</option>
+  </select>
+  <select id="FeePaidStatus" required>
+    <option value="">Fee Paid?</option>
+    <option value="yes">yes</option>
+    <option value="no">no</option>
+  </select>
+  <input type="text" id="studentID" placeholder="Student ID" required>
+  <button type="submit">Add to Sheet</button>
+</form>
+
+<br>
+<button onclick="downloadCSV()">Download CSV</button>
+
+<table id="dataTable">
+  <thead>
+    <tr>
+      <th>Student Name</th>
+      <th>Class</th>
+      <th>Result Card</th>
+      <th>Fee Paid Status</th>
+      <th>Student ID</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+
+  const classToStudents = {
+    
+    "KG": [
+    'Muhammed hathim',
+    'Muhammed izaan',
+    'Omar abdul rahman',
+    'Muhammed kv',
+    'Muhammed afshin bilal',
+    'Adam A',
+    'Aadam Muhammed',
+    'Ayan rasheed',
+    'Muhammed hazim javid',
+    'Muhammed ozil',
+    'Muhammed Aamir',
+    'Muhammed ayizin anas',
+    'Salah ameer',
+    'Ajwa arshad',
+    'Amina menal',
+    'Kenza suraj',
+    'Hawwa maryam',
+    'Ziya mehar',
+    'Ziya ayisha farhan',
+    'Zahabiya pk',
+    'Fathima inaya',
+    'Ayisha aslam',
+    'Zahara Amana',
+    'Zahara fathima',
+    'Minsa maryam'
+  ],
+    "1A": [
+    'Elaan Muhammed',
+    'Ehaan Ibrahim',
+    'Muhammed V',
+    'Aydhin Ahad',
+    'Muhammed Shezil',
+    'Ahmed Ziyad',
+    'Hanin Hidhash',
+    'Inaya maryam',
+    'Amina Ridha riyas',
+    'Eshaal fathima',
+    'Amina Zahiya',
+    'Zahiya fathima',
+    'Aysha Sherin',
+    'Muhammed Aadam ishan',
+    'Abdhulla',
+    'Rayan ramees',
+    'Fathima Bushra',
+    'Aleema shuaib',
+    'Riza Zubeer'
+  ],
+    "1B": [
+    'Muhammed Azlin',
+    'Muhammed Thameem',
+    'Muhammed Shezin',
+    'Muhammed Yaseen TP',
+    'Misbah TK',
+    'Zakkariya Shiyar',
+    'Amina manha',
+    'Ezza ezlin',
+    'Fathima Reem',
+    'Kadeejathul Afra',
+    'Laiba fathima',
+    'Thaiba Maryam',
+    'Zanha fathima',
+    'Hyzin Muhammed',
+    'Zaid bin afneed',
+    'Zeenath',
+    'Fathimathul hadiya'
+  ],
+    "1C": [
+    'Muhammed Shah Zaman',
+    'Muhammed Yaseen',
+    'Afiya Thariq',
+    'Afthariya azza',
+    'Ajaba Aslam',
+    'Haniya sarfras',
+    'Inaya maryam',
+    'Izza safiya',
+    'Nashwa Zainab',
+    'Muhammed Zaim',
+    'Yousuf',
+    'Zaid bin zaheer',
+    'Faiha',
+    'Muhammed Ahnaf',
+    'Muhammed sahal',
+    'Umerul haq',
+    'Zahra shuaib',
+    'Faaz bin nashim'
+  ],
+    "2A": [
+    'Ahil Anwar',
+    'Abdhulla Aslam',
+    'Ayan bin anees',
+    'Fawzan Faizal',
+    'Hamdhan bin nashim',
+    'Muhammed Izyan',
+    'Muhammed Minhaj',
+    'Muhammed Rizin',
+    'Nooh bin shamseer',
+    'Rayan unais',
+    'Aysha Binth rayees',
+    'Fathima Zahara',
+    'Zanha Sajir',
+    'Abaan',
+    'Azra asya',
+    'Muhammed Ahil',
+    'Muhammed N',
+    'Ridan jamshid',
+    'Amina Rasheed',
+    'Hadeel khaleel',
+    'Fathimath Noura'
+  ],
+    "2B": [
+    'Amaan Muhammed',
+    'Ayman Shajahan',
+    'Muhammed Afreedh',
+    'Muhammed Bilal',
+    'Muhammed Qais',
+    'Muhammed Raihan',
+    'Amaani Shameer',
+    'Asya Azad',
+    'Raiza Zainab',
+    'Amina Meharin',
+    'Ismath PP',
+    'Fathima Zaharin',
+    'Salma Binth Rashid',
+    'Adil Adam',
+    'Fathima pk',
+    'Rayan p',
+    'Zunoon zaid',
+    'Nashfa fathima',
+    'Humaid',
+    'Muhammed',
+    'Ziya shuaib'
+  ],
+    "2C":[
+    'Areen cm',
+    'Hamin Saheer',
+    'Hizan',
+    'Inam Ahad',
+    'Muhammed Bilal',
+    'Muhammed Nahyan',
+    'Nazin sha',
+    'Zohan Omer',
+    'Aysha Zabel',
+    'Inara fathima',
+    'Lamiya Zaib',
+    'Maryam p',
+    'Minha maryam',
+    'Shifa Safiya',
+    'Bilal Abdul qader',
+    'Muhammed',
+    'Shad ibn anas',
+    'Aysha Binth ramshad',
+    'Thanisha'
+  ],
+   "3A":[
+    'Aboobaker Sidheeque',
+    'Aman Abdhul Qader',
+    'Muhammed Ayaan',
+    'Ayan hyzam',
+    'Muhammed Hizan Usman',
+    'Ameekha Sooraj',
+    'Haza kadheeja',
+    'Nooha mehwish',
+    'Naifa nafsa',
+    'Jaza nafeesa',
+    'Fathimathul misla',
+    'Aisha aza ain',
+    'Kadeeja kv',
+    'Zanubiya Arif',
+    'Muhammed Finaal',
+    'Hamdan zubair',
+    'Muhammed Razin',
+    'Abdul Hadi',
+    'Mehza sadik'
+  ],
+   "3B":[
+    'Eshaan Rais',
+    'Ayaan M',
+    'Zidhan',
+    'Risil',
+    'Shazal Aymen',
+    'Minhaj',
+    'Aisha Afana',
+    'Fathima Zahara',
+    'Mehdiya',
+    'Haiqa',
+    'Nuha Faisal',
+    'Zara Airin',
+    'Maryam basheer',
+    'Ameen',
+    'Afreed',
+    'Hannan',
+    'Razal',
+    'Khadeeja ramees'
+  ],
+   "4":[
+    'Aalim Faisal',
+    'Ameen Rahman',
+    'Aydhin Eemaan',
+    'Fahad Muhammed Faisal',
+    'Izzath Ismail',
+    'Muhammed Aimal Aiz',
+    'Muhammed Faizan',
+    'Muhammed Hamdhan Faisal',
+    'Muhammed Ribin',
+    'Muhammed Rizwan',
+    'Muhammed Zalool',
+    'Aysha Zenha',
+    'Fathima Zahra',
+    'Zeba Maryam',
+    'Hamna',
+    'Ehan bin Noufal',
+    'Aliya Zuhara',
+    'Umer Zaif',
+    'Muhammed Hamdan',
+    'Muhammed Ihsan',
+    'Muhammed Rayyan',
+    'Muhammed Yahya',
+    'Muhammed Zahid',
+    'Ameliya',
+    'Amina M',
+    'Dua Maryam',
+    'Fathima Basheer',
+    'Fathima KP',
+    'Fathima Nyla',
+    'Khadeeja PK',
+    'Manha Maryam',
+    'Misba Fathima',
+    'Misba Binth Shaheer'
+  ],
+   "6":[
+    'Izaan Aydhin',
+    'Muhammed Nashwan',
+    'Muhammed Amaan',
+    'Muhammed Nabhan',
+    'Izaan Muhammed',
+    'Ihsan Anees',
+    'Ziniya Zehak',
+    'Fathima Farha',
+    'Fathima CP',
+    'Sumayya Faizal',
+    'Dua Ain',
+    'Alayna Siyad',
+    'Nafeesa EM',
+    'Maryam Mehak',
+    'Athifa',
+    'Muhammed Amdhan',
+    'Muhammed Najih',
+    'Hazim Muhammed',
+    'Lamih Ibrahim',
+    'Hyfa Ayana',
+    'Zainab Binth Rayees',
+    'Rifa Fathima',
+    'Haniya Ramla',
+    'Sumayya Nizar',
+    'Nehana Nadeem',
+    'Rouheen Arshad'
+  ],
+   "7":[
+    'Muhammed A',
+    'Muhammed Ramzan K',
+    'Muhammed Fajr T',
+    'Misbahul Haque',
+    'Fathimath Riza Riyas',
+    'Hanna Thasneem',
+    'Laziya Thariq',
+    'Maziya Maryam',
+    'Minza',
+    'Nazmin Noufal',
+    'Aflah bin Rasheed',
+    'Muhammed Bilal',
+    'Muhammed Shabab',
+    'Ayshathul Zooni',
+    'Heiza Hajara',
+    'Neha Fathima'
+], 
+  };
+
+  const classSelect = document.getElementById("class");
+  const studentNameSelect = document.getElementById("studentName");
+
+  classSelect.addEventListener("change", () => {
+    const selectedClass = classSelect.value;
+    studentNameSelect.innerHTML = '<option value="">Select Student Name</option>';
+
+    if (classToStudents[selectedClass]) {
+      classToStudents[selectedClass].forEach(name => {
+        const option = document.createElement("option");
+        option.value = name;
+        option.textContent = name;
+        studentNameSelect.appendChild(option);
+      });
+    }
+  });
+
+
+
+  // division
+  const form = document.getElementById("studentForm");
+  const tableBody = document.querySelector("#dataTable tbody");
+  let data = [];
+
+  form.addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const student = {
+      studentName: document.getElementById("studentName").value,
+      class: document.getElementById("class").value,
+      resultCard: document.getElementById("resultCard").value,
+      FeePaidStatus: document.getElementById("FeePaidStatus").value,
+      studentID: document.getElementById("studentID").value,
+    };
+
+    data.push(student);
+    addToTable(student);
+    form.reset();
+  });
+
+  function addToTable(student) {
+    const row = document.createElement("tr");
+    for (const key in student) {
+      const cell = document.createElement("td");
+      cell.textContent = student[key];
+      row.appendChild(cell);
+    }
+    tableBody.appendChild(row);
+  }
+
+  function downloadCSV() {
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "studentName,class,resultCard,FeePaidStatus,studentID\n";
+    data.forEach(row => {
+      csvContent += `${row.studentName},${row.class},${row.resultCard},${row.FeePaidStatus},${row.studentID}\n`;
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "students_data.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+</script>
+
+</body>
+</html> -->

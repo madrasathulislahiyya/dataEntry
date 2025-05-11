@@ -1,449 +1,193 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Student Form</title>
+  <meta charset="UTF-8">
+  <title>Student Marks Entry</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body {
-      font-family: Arial;
-      background-color: #f2f2f2;
-      padding: 20px;
-    }
-    form {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      width: 300px;
-      margin: auto;
-    }
-    input, select {
-      width: 100%;
-      padding: 8px;
-      margin-top: 10px;
-      margin-bottom: 15px;
-    }
-    button {
-      background-color: green;
-      color: white;
-      padding: 10px;
-      border: none;
-      width: 100%;
-      cursor: pointer;
-    }
-    table {
-      margin-top: 30px;
-      width: 100%;
-      border-collapse: collapse;
-    }
-    table, th, td {
-      border: 1px solid black;
-      padding: 8px;
+    body { font-family: Arial; padding: 15px; background-color: #f0f0f0; margin: 0; }
+    label, input, select, button { width: 100%; margin: 10px 0; font-size: 1rem; }
+    input, select { padding: 8px; }
+    button { padding: 10px; background-color: #04182c; color: white; border: none; border-radius: 5px; }
+    button:hover { background-color: #04101d; }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; font-size: 0.95rem; }
+    th { background-color: #08315a; color: white; }
+
+    @media (max-width: 600px) {
+      th, td { font-size: 0.85rem; padding: 6px; }
+      button { font-size: 1rem; }
     }
   </style>
 </head>
 <body>
 
-<h2>Student Entry Form</h2>
+<h2>Enter Student Marks</h2>
 
-<form id="studentForm">
-  <select id="class" required>
-    <option value="">Select Class</option>
-    <option value="KG">KG</option>
-    <option value="1A">1A</option>
-    <option value="1B">1B</option>
-    <option value="1C">1C</option>
-    <option value="2A">2A</option>
-    <option value="2B">2B</option>
-    <option value="2C">2C</option>
-    <option value="3A">3A</option>
-    <option value="3B">3B</option>
-    <option value="4">4</option>  
-    <option value="6">6</option>
-    <option value="7">7</option>
-  </select>
-  
-  <select id="studentName" required>
-    <option value="">Select Student Name</option>
-  </select>
+<label>Student ID:
+  <input type="text" id="studentID" oninput="fillStudentDetails()">
+</label>
+<label>Name: <input type="text" id="studentName" readonly></label>
+<label>Class: <input type="text" id="studentClass" readonly></label>
+<label>Result Card: <input type="text" id="resultCard" readonly></label>
+<label>Fee Paid Status: <input type="text" id="feeStatus" readonly></label>
 
-  <select id="resultCard" required>
-    <option value="">pass or fail?</option>
-    <option value="pass">pass</option>
-    <option value="fail">fail</option>
-    <option value="noexam">noexam</option>
+<label>Subject:
+  <select id="subjectSelect">
+    <option value="">Select subject</option>
   </select>
-  <select id="FeePaidStatus" required>
-    <option value="">Fee Paid?</option>
-    <option value="yes">yes</option>
-    <option value="no">no</option>
-  </select>
-  <input type="text" id="studentID" placeholder="Student ID" required>
-  <button type="submit">Add to Sheet</button>
-</form>
+</label>
+<label>Mark:
+  <input type="number" id="markInput">
+</label>
+<button onclick="addSubjectMark()">Add Subject Mark</button>
 
-<br>
-<button onclick="downloadCSV()">Download CSV</button>
+<h3>Subject Marks</h3>
+<table id="subjectTable">
+  <tr><th>Subject</th><th>Mark</th></tr>
+</table>
 
-<table id="dataTable">
-  <thead>
-    <tr>
-      <th>Student Name</th>
-      <th>Class</th>
-      <th>Result Card</th>
-      <th>Fee Paid Status</th>
-      <th>Student ID</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
+<button onclick="submitFinal()">Submit to Final Table</button>
+<button onclick="downloadCSV()">⬇️ Download Final Table as CSV</button>
+
+<h3>Final Table</h3>
+<table id="finalTable">
+  <tr>
+    <th>ID</th><th>Name</th><th>Class</th><th>Result</th><th>Fee</th><th>Marks</th>
+  </tr>
 </table>
 
 <script>
+  let studentDB = {};
+  let currentMarks = {};
 
-  const classToStudents = {
-    
-    "KG": [
-    'Muhammed hathim',
-    'Muhammed izaan',
-    'Omar abdul rahman',
-    'Muhammed kv',
-    'Muhammed afshin bilal',
-    'Adam A',
-    'Aadam Muhammed',
-    'Ayan rasheed',
-    'Muhammed hazim javid',
-    'Muhammed ozil',
-    'Muhammed Aamir',
-    'Muhammed ayizin anas',
-    'Salah ameer',
-    'Ajwa arshad',
-    'Amina menal',
-    'Kenza suraj',
-    'Hawwa maryam',
-    'Ziya mehar',
-    'Ziya ayisha farhan',
-    'Zahabiya pk',
-    'Fathima inaya',
-    'Ayisha aslam',
-    'Zahara Amana',
-    'Zahara fathima',
-    'Minsa maryam'
-  ],
-    "1A": [
-    'Elaan Muhammed',
-    'Ehaan Ibrahim',
-    'Muhammed V',
-    'Aydhin Ahad',
-    'Muhammed Shezil',
-    'Ahmed Ziyad',
-    'Hanin Hidhash',
-    'Inaya maryam',
-    'Amina Ridha riyas',
-    'Eshaal fathima',
-    'Amina Zahiya',
-    'Zahiya fathima',
-    'Aysha Sherin',
-    'Muhammed Aadam ishan',
-    'Abdhulla',
-    'Rayan ramees',
-    'Fathima Bushra',
-    'Aleema shuaib',
-    'Riza Zubeer'
-  ],
-    "1B": [
-    'Muhammed Azlin',
-    'Muhammed Thameem',
-    'Muhammed Shezin',
-    'Muhammed Yaseen TP',
-    'Misbah TK',
-    'Zakkariya Shiyar',
-    'Amina manha',
-    'Ezza ezlin',
-    'Fathima Reem',
-    'Kadeejathul Afra',
-    'Laiba fathima',
-    'Thaiba Maryam',
-    'Zanha fathima',
-    'Hyzin Muhammed',
-    'Zaid bin afneed',
-    'Zeenath',
-    'Fathimathul hadiya'
-  ],
-    "1C": [
-    'Muhammed Shah Zaman',
-    'Muhammed Yaseen',
-    'Afiya Thariq',
-    'Afthariya azza',
-    'Ajaba Aslam',
-    'Haniya sarfras',
-    'Inaya maryam',
-    'Izza safiya',
-    'Nashwa Zainab',
-    'Muhammed Zaim',
-    'Yousuf',
-    'Zaid bin zaheer',
-    'Faiha',
-    'Muhammed Ahnaf',
-    'Muhammed sahal',
-    'Umerul haq',
-    'Zahra shuaib',
-    'Faaz bin nashim'
-  ],
-    "2A": [
-    'Ahil Anwar',
-    'Abdhulla Aslam',
-    'Ayan bin anees',
-    'Fawzan Faizal',
-    'Hamdhan bin nashim',
-    'Muhammed Izyan',
-    'Muhammed Minhaj',
-    'Muhammed Rizin',
-    'Nooh bin shamseer',
-    'Rayan unais',
-    'Aysha Binth rayees',
-    'Fathima Zahara',
-    'Zanha Sajir',
-    'Abaan',
-    'Azra asya',
-    'Muhammed Ahil',
-    'Muhammed N',
-    'Ridan jamshid',
-    'Amina Rasheed',
-    'Hadeel khaleel',
-    'Fathimath Noura'
-  ],
-    "2B": [
-    'Amaan Muhammed',
-    'Ayman Shajahan',
-    'Muhammed Afreedh',
-    'Muhammed Bilal',
-    'Muhammed Qais',
-    'Muhammed Raihan',
-    'Amaani Shameer',
-    'Asya Azad',
-    'Raiza Zainab',
-    'Amina Meharin',
-    'Ismath PP',
-    'Fathima Zaharin',
-    'Salma Binth Rashid',
-    'Adil Adam',
-    'Fathima pk',
-    'Rayan p',
-    'Zunoon zaid',
-    'Nashfa fathima',
-    'Humaid',
-    'Muhammed',
-    'Ziya shuaib'
-  ],
-    "2C":[
-    'Areen cm',
-    'Hamin Saheer',
-    'Hizan',
-    'Inam Ahad',
-    'Muhammed Bilal',
-    'Muhammed Nahyan',
-    'Nazin sha',
-    'Zohan Omer',
-    'Aysha Zabel',
-    'Inara fathima',
-    'Lamiya Zaib',
-    'Maryam p',
-    'Minha maryam',
-    'Shifa Safiya',
-    'Bilal Abdul qader',
-    'Muhammed',
-    'Shad ibn anas',
-    'Aysha Binth ramshad',
-    'Thanisha'
-  ],
-   "3A":[
-    'Aboobaker Sidheeque',
-    'Aman Abdhul Qader',
-    'Muhammed Ayaan',
-    'Ayan hyzam',
-    'Muhammed Hizan Usman',
-    'Ameekha Sooraj',
-    'Haza kadheeja',
-    'Nooha mehwish',
-    'Naifa nafsa',
-    'Jaza nafeesa',
-    'Fathimathul misla',
-    'Aisha aza ain',
-    'Kadeeja kv',
-    'Zanubiya Arif',
-    'Muhammed Finaal',
-    'Hamdan zubair',
-    'Muhammed Razin',
-    'Abdul Hadi',
-    'Mehza sadik'
-  ],
-   "3B":[
-    'Eshaan Rais',
-    'Ayaan M',
-    'Zidhan',
-    'Risil',
-    'Shazal Aymen',
-    'Minhaj',
-    'Aisha Afana',
-    'Fathima Zahara',
-    'Mehdiya',
-    'Haiqa',
-    'Nuha Faisal',
-    'Zara Airin',
-    'Maryam basheer',
-    'Ameen',
-    'Afreed',
-    'Hannan',
-    'Razal',
-    'Khadeeja ramees'
-  ],
-   "4":[
-    'Aalim Faisal',
-    'Ameen Rahman',
-    'Aydhin Eemaan',
-    'Fahad Muhammed Faisal',
-    'Izzath Ismail',
-    'Muhammed Aimal Aiz',
-    'Muhammed Faizan',
-    'Muhammed Hamdhan Faisal',
-    'Muhammed Ribin',
-    'Muhammed Rizwan',
-    'Muhammed Zalool',
-    'Aysha Zenha',
-    'Fathima Zahra',
-    'Zeba Maryam',
-    'Hamna',
-    'Ehan bin Noufal',
-    'Aliya Zuhara',
-    'Umer Zaif',
-    'Muhammed Hamdan',
-    'Muhammed Ihsan',
-    'Muhammed Rayyan',
-    'Muhammed Yahya',
-    'Muhammed Zahid',
-    'Ameliya',
-    'Amina M',
-    'Dua Maryam',
-    'Fathima Basheer',
-    'Fathima KP',
-    'Fathima Nyla',
-    'Khadeeja PK',
-    'Manha Maryam',
-    'Misba Fathima',
-    'Misba Binth Shaheer'
-  ],
-   "6":[
-    'Izaan Aydhin',
-    'Muhammed Nashwan',
-    'Muhammed Amaan',
-    'Muhammed Nabhan',
-    'Izaan Muhammed',
-    'Ihsan Anees',
-    'Ziniya Zehak',
-    'Fathima Farha',
-    'Fathima CP',
-    'Sumayya Faizal',
-    'Dua Ain',
-    'Alayna Siyad',
-    'Nafeesa EM',
-    'Maryam Mehak',
-    'Athifa',
-    'Muhammed Amdhan',
-    'Muhammed Najih',
-    'Hazim Muhammed',
-    'Lamih Ibrahim',
-    'Hyfa Ayana',
-    'Zainab Binth Rayees',
-    'Rifa Fathima',
-    'Haniya Ramla',
-    'Sumayya Nizar',
-    'Nehana Nadeem',
-    'Rouheen Arshad'
-  ],
-   "7":[
-    'Muhammed A',
-    'Muhammed Ramzan K',
-    'Muhammed Fajr T',
-    'Misbahul Haque',
-    'Fathimath Riza Riyas',
-    'Hanna Thasneem',
-    'Laziya Thariq',
-    'Maziya Maryam',
-    'Minza',
-    'Nazmin Noufal',
-    'Aflah bin Rasheed',
-    'Muhammed Bilal',
-    'Muhammed Shabab',
-    'Ayshathul Zooni',
-    'Heiza Hajara',
-    'Neha Fathima'
-], 
+  const subjectMap = {
+    "KG": ["Quran"],
+    "1A": ["Hifd", "Arabic", "Poonilaav"],
+    "1B": ["Hifd", "Arabic", "Poonilaav"],
+    "1C": ["Hifd", "Arabic", "Poonilaav"],
+    "2A": ["Quran","Hifd", "Arabic", "Vishwasam","Karmam","swabavam","Charithram","thafseer"],
+    "2B": ["Quran","Hifd", "Arabic", "Vishwasam","Karmam","swabavam","Charithram","thafseer"],
+    "2C": ["Quran","Hifd", "Arabic", "Vishwasam","Karmam","swabavam","Charithram","thafseer"],
+    "3A": ["Quran","Hifd", "Arabic", "Vishwasam","Karmam","swabavam","Charithram","thafseer"],
+    "3A": ["Quran","Hifd", "Arabic", "Vishwasam","Karmam","swabavam","Charithram","thafseer"],
+    "3A": ["Quran","Hifd", "Arabic", "Vishwasam","Karmam","swabavam","Charithram","thafseer"],
+    "4": ["Quran","Hifd", "Thajweed", "Arabic", "Vishwasam","Karmam","swabavam","Charithram","thafseer"],
+    "5": ["Quran","Hifd", "Thajweed", "Arabic", "Vishwasam","Karmam","swabavam","Charithram","thafseer"],
+    "6": ["Quran","Hifd", "Thajweed", "Arabic", "Vishwasam","Karmam","swabavam","Charithram","thafseer"],
+    "7": ["Quran","Hifd", "Arabic", "Vishwasam","Karmam","Charithram","thafseer","Hadees"],
+    "8": ["Quran","Hifd", "Arabic", "Vishwasam","Karmam","Charithram","thafseer","Hadees"],
   };
 
-  const classSelect = document.getElementById("class");
-  const studentNameSelect = document.getElementById("studentName");
+  async function loadGoogleSheet() {
+    const url = 'https://docs.google.com/spreadsheets/d/1uPfXqzdnisE-eizOkE1b6xAUfblXqvEcdzdFDNhv_RE/gviz/tq?tqx=out:csv';
+    try {
+      const response = await fetch(url);
+      const csvText = await response.text();
+      const lines = csvText.trim().split("\n");
+      const headers = lines[0].split(",").map(h => h.replace(/^"|"$/g, '').trim());
 
-  classSelect.addEventListener("change", () => {
-    const selectedClass = classSelect.value;
-    studentNameSelect.innerHTML = '<option value="">Select Student Name</option>';
 
-    if (classToStudents[selectedClass]) {
-      classToStudents[selectedClass].forEach(name => {
-        const option = document.createElement("option");
-        option.value = name;
-        option.textContent = name;
-        studentNameSelect.appendChild(option);
+      lines.slice(1).forEach(line => {
+      const fields = line.split(",");
+      const row = {};
+      headers.forEach((h, i) => {
+           row[h] = fields[i]?.replace(/^"|"$/g, '').trim();
       });
+      
+      const id = row["studentID"];
+        if (id) {
+          studentDB[id] = {
+            name: row["studentName"],
+            class: row["class"],
+            resultCard: row["resultCard"],
+            feeStatus: row["FeePaidStatus"]
+          };
+        }
+      });
+      console.log("Student DB loaded:", studentDB);
+    } catch (e) {
+      console.error("Failed to load CSV:", e);
     }
-  });
+  }
 
+  function fillStudentDetails() {
+    const id = document.getElementById("studentID").value;
+    const data = studentDB[id];
+    if (data) {
+      document.getElementById("studentName").value = data.name;
+      document.getElementById("studentClass").value = data.class;
+      document.getElementById("resultCard").value = data.resultCard;
+      document.getElementById("feeStatus").value = data.feeStatus;
 
+      currentMarks = {};
+      document.getElementById("subjectTable").innerHTML = "<tr><th>Subject</th><th>Mark</th></tr>";
 
-  // division
-  const form = document.getElementById("studentForm");
-  const tableBody = document.querySelector("#dataTable tbody");
-  let data = [];
+      const subjectSelect = document.getElementById("subjectSelect");
+      subjectSelect.innerHTML = "<option value=''>Select subject</option>";
+      const subjects = subjectMap[data.class] || [];
+      subjects.forEach(sub => {
+        const opt = document.createElement("option");
+        opt.value = sub;
+        opt.text = sub;
+        subjectSelect.appendChild(opt);
+      });
+    } else {
+      console.log("..");
+    }
+  }
 
-  form.addEventListener("submit", function(e) {
-    e.preventDefault();
+  function addSubjectMark() {
+    const subject = document.getElementById("subjectSelect").value;
+    const mark = document.getElementById("markInput").value;
+    if (!subject || !mark) return;
 
-    const student = {
-      studentName: document.getElementById("studentName").value,
-      class: document.getElementById("class").value,
-      resultCard: document.getElementById("resultCard").value,
-      FeePaidStatus: document.getElementById("FeePaidStatus").value,
-      studentID: document.getElementById("studentID").value,
-    };
+    currentMarks[subject] = mark;
 
-    data.push(student);
-    addToTable(student);
-    form.reset();
-  });
-
-  function addToTable(student) {
     const row = document.createElement("tr");
-    for (const key in student) {
-      const cell = document.createElement("td");
-      cell.textContent = student[key];
-      row.appendChild(cell);
-    }
-    tableBody.appendChild(row);
+    row.innerHTML = `<td>${subject}</td><td>${mark}</td>`;
+    document.getElementById("subjectTable").appendChild(row);
+    document.getElementById("markInput").value = "";
+  }
+
+  function submitFinal() {
+    const id = document.getElementById("studentID").value;
+    const name = document.getElementById("studentName").value;
+    const cls = document.getElementById("studentClass").value;
+    const result = document.getElementById("resultCard").value;
+    const fee = document.getElementById("feeStatus").value;
+    const marksJSON = JSON.stringify(currentMarks);
+
+    const row = document.createElement("tr");
+    row.innerHTML = `<td>${id}</td><td>${name}</td><td>${cls}</td><td>${result}</td><td>${fee}</td><td>${marksJSON}</td>`;
+    document.getElementById("finalTable").appendChild(row);
   }
 
   function downloadCSV() {
-    let csvContent = "data:text/csv;charset=utf-8,";
-    csvContent += "studentName,class,resultCard,FeePaidStatus,studentID\n";
-    data.forEach(row => {
-      csvContent += `${row.studentName},${row.class},${row.resultCard},${row.FeePaidStatus},${row.studentID}\n`;
-    });
+    const rows = [];
+    const table = document.getElementById("finalTable");
+    for (let i = 0; i < table.rows.length; i++) {
+      const cells = table.rows[i].cells;
+      const row = [];
+      for (let j = 0; j < cells.length; j++) {
+        row.push('"' + cells[j].innerText + '"');
+      }
+      rows.push(row.join(","));
+    }
 
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "students_data.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const csvContent = rows.join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "student_marks.csv";
+    a.click();
   }
+
+  // Load sheet on page load
+  loadGoogleSheet();
 </script>
+
 
 </body>
 </html>
