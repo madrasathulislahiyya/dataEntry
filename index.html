@@ -8,12 +8,12 @@
     body { font-family: Arial; padding: 15px; background-color: #f0f0f0; margin: 0; }
     label, input, select, button { width: 100%; margin: 10px 0; font-size: 1rem; }
     input, select { padding: 8px; }
-    button { padding: 10px; background-color: #04182c; color: white; border: none; border-radius: 5px; }
-    button:hover { background-color: #04101d; }
+    button { padding: 10px; background-color: #4a4e52; color: white; border: none; border-radius: 5px; }
+    button:hover { background-color: #0056b3; }
 
     table { width: 100%; border-collapse: collapse; margin-top: 15px; }
     th, td { border: 1px solid #ccc; padding: 8px; text-align: left; font-size: 0.95rem; }
-    th { background-color: #08315a; color: white; }
+    th { background-color: #2e2f30; color: white; }
 
     @media (max-width: 600px) {
       th, td { font-size: 0.85rem; padding: 6px; }
@@ -171,7 +171,7 @@
       const cells = table.rows[i].cells;
       const row = [];
       for (let j = 0; j < cells.length; j++) {
-        row.push('"' + cells[j].innerText + '"');
+        row.push('"' +cells[j].innerText.replace(/"/g, '""') + '"');
       }
       rows.push(row.join(","));
     }

@@ -16,3 +16,6 @@ df = pd.read_csv('studentmarks9.csv')  # replace with your actual filename
 # Display the result
 # duplicate_rows.to_csv('fayad_dupe.csv')
 print(df.info())
+
+
+
